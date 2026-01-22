@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Security | Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar / Controls -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h1>AEGIS</h1>
+                <p>Artificial Expert Graded Intelligence System</p>
+            </div>
+
+            <form action="/process" method="POST" enctype="multipart/form-data" class="control-panel">
+                <div class="upload-section">
+                    <label for="imageUpload" class="upload-btn">
+                         Select Document
+                    </label>
+                    <input type="file" id="imageUpload" name="image" required onchange="previewImage(event)">
+                    <div id="file-name" class="file-info">No file selected</div>
+                </div>
+
+                <div class="rules-section">
+                    <h3>Target Protocols</h3>
+                    <label class="toggle">
+                        <input type="checkbox" name="rules" value="SSN">
+                        <span class="slider"></span>
+                        <span class="label-text">SSN Patterns</span>
+                    </label>
+                    <label class="toggle">
+                        <input type="checkbox" name="rules" value="DOB">
+                        <span class="slider"></span>
+                        <span class="label-text">Date of Birth</span>
+                    </label>
+                    <label class="toggle">
+                        <input type="checkbox" name="rules" value="NAME">
+                        <span class="slider"></span>
+                        <span class="label-text">Names (Entities)</span>
+                    </label>
+                </div>
+
+                <div class="mission-section">
+                    <h3>Reasoning Engine</h3>
+                    <input type="text" name="mission" class="mission-input"
+                        placeholder="e.g. 'Mask all faces and dates'">
+                </div>
+
+                <button type="submit" class="execute-btn">INITIATE REDACTION</button>
+            </form>
+
+            <div class="system-status">
+                <h3>System Status</h3>
+                <ul>
+                    <li><span class="status-dot online"></span> Orchestrator: <strong>ONLINE</strong></li>
+                    <li><span class="status-dot online"></span> Tesseract Core: <strong>ACTIVE</strong></li>
+                    <li><span class="status-dot idle"></span> Agents: <strong>IDLE</strong></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-view">
+            <header>
+                <h2>Secure Document Processing Console</h2>
+            </header>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="flashes-bar">
+                {% for message in messages %}
+                <span>⚠ {{ message }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <div class="workspace">
+                <!-- Preview / Result Area -->
+                <div class="visual-area">
+                    {% if result_url %}
+                    <div class="image-card result-card">
+                        <div class="card-header">
+                            <span>PROCESSED OUTPUT</span>
+                            <a href="/download/{{ result_filename }}" class="download-icon-btn"
+                                title="Download Result">⬇ DOWNLOAD</a>
+                        </div>
+
+                        <!-- Image Container: Grows to fill space, centers image -->
+                        <div
+                            style="flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(0,0,0,0.2); padding: 10px;">
+                            <img src="{{ result_url }}" alt="Redacted Document"
+                                style="max-width: 100%; max-height: 100%; object-fit: contain; border: 1px solid #334155;">
+                        </div>
+
+                        <!-- Footer: Fixed height, contains button -->
+                        <div
+                            style="flex-shrink: 0; padding: 15px; background: var(--bg-panel); border-top: 1px solid var(--border);">
+                            <a href="/download/{{ result_filename }}" class="download-link"
+                                style="margin: 0; width: 100%; box-sizing: border-box; text-align: center;">⬇ DOWNLOAD
+                                COMPLETED FILE</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="image-card placeholder-card">
+                        <div class="placeholder-content">
+                            <span>Waiting for Input...</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Agent Console -->
+                <div class="console-area">
+                    <div class="console-header">
+                        <span>>_ AGENT EXECUTION LOG</span>
+                    </div>
+                    <div class="terminal-window">
+                        <ul id="log-list">
+                            {% if logs %}
+                            {% for log in logs %}
+                            <li><span class="timestamp">[{{ range(0, 99) | random }}:{{ range(0, 99) | random }}]</span>
+                                <span class="log-msg">{{ log }}</span>
+                            </li>
+                            {% endfor %}
+                            {% else %}
+                            <li><span class="prompt">></span> System ready. Waiting for commands.</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const fileName = input.files[0] ? input.files[0].name : "No file selected";
+            document.getElementById('file-name').innerText = fileName;
+        }
+    </script>
+
+</body>
+
+</html>
